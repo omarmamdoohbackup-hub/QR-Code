@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#090d16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>نظام التحقق من بطاقات الدخول</title>
+  
+  <!-- Google Fonts: Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- html5-qrcode library -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="badge-tag">
+        <span class="pulse-dot"></span>
+        حفل التخرج السنوي
+      </div>
+      <h1 class="main-title">نظام التحقق من بطاقات الدخول</h1>
+      <p class="sub-title">امسح رمز QR للتحقق من البطاقة</p>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- 1. Idle / Start State -->
+      <section id="start-section" class="card-box view-section active">
+        <div class="shield-icon-wrapper">
+          <svg class="shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <h2 class="section-title">جاهز لمسح البطاقات</h2>
+        <p class="section-desc">اضغط على الزر أدناه لبدء تشغيل الكاميرا والتحقق من بطاقات الضيوف.</p>
+        <button id="btn-start-scan" class="btn btn-primary btn-large">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
+            <rect x="7" y="7" width="10" height="10" rx="1"/>
+          </svg>
+          <span>بدء المسح</span>
+        </button>
+      </section>
+
+      <!-- 2. Active Scanner State -->
+      <section id="scanner-section" class="card-box view-section">
+        <div class="scanner-header">
+          <span class="scanner-guide-text">وجّه الكاميرا نحو رمز QR</span>
+          <div class="camera-controls">
+            <button id="btn-toggle-torch" class="btn-icon-control" title="الفلاش" style="display: none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </button>
+            <button id="btn-switch-camera" class="btn-icon-control" title="تبديل الكاميرا">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 10c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 2.052.774 3.924 2.052 5.348L4 18h5v-5l-1.95 1.95C6.064 13.805 5.5 12.47 5.5 11c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5-2.91 6.5-6.5 6.5c-1.127 0-2.185-.286-3.109-.791l-1.144 1.144C8.98 20.47 10.435 21 12 21c4.418 0 8-3.582 8-8z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="scanner-viewport-wrapper">
+          <div id="qr-reader"></div>
+          <div class="scanner-overlay">
+            <div class="scanner-frame">
+              <div class="laser-line"></div>
+              <span class="corner top-right"></span>
+              <span class="corner top-left"></span>
+              <span class="corner bottom-right"></span>
+              <span class="corner bottom-left"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scanner-footer">
+          <button id="btn-stop-scan" class="btn btn-secondary">
+            <span>إيقاف الكاميرا</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 3. Loading / Processing State -->
+      <section id="loading-section" class="card-box view-section">
+        <div class="spinner-wrapper">
+          <div class="spinner"></div>
+        </div>
+        <h3 class="loading-title">جاري التحقق من البطاقة...</h3>
+        <p class="loading-desc">يرجى الانتظار لحظة</p>
+      </section>
+
+      <!-- 4. Result State -->
+      <section id="result-section" class="card-box view-section result-box">
+        
+        <div class="result-status-icon-wrapper" id="result-icon-container">
+          <!-- Dynamically filled with icon -->
+        </div>
+
+        <h2 id="result-title" class="result-headline">--</h2>
+        
+        <div id="card-type-badge" class="card-type-badge" style="display: none;">
+          <span id="result-card-type-icon" class="card-type-icon"></span>
+          <span id="result-card-type" class="card-type-text">--</span>
+        </div>
+
+        <div id="card-number-badge" class="card-number-container" style="display: none;">
+          <span class="card-number-label">رقم البطاقة</span>
+          <span id="result-card-number" class="card-number-value">000</span>
+        </div>
+
+        <p id="result-message" class="result-subtext">--</p>
+        
+        <div id="result-meta" class="result-timestamp-box" style="display: none;">
+          <svg class="meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span id="result-meta-text">--</span>
+        </div>
+
+        <div class="result-actions">
+          <button id="btn-scan-again" class="btn btn-primary btn-large">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            <span>مسح بطاقة أخرى</span>
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span>بوابة أمن الحفل • اتصال آمن ومشفر</span>
+    </footer>
+
+  </div>
+
+  <script src="app.js?v=1.2.0"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/security_page/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/security_page/$1"
+    }
+  ]
+}

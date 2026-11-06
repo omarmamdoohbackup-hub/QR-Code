@@ -1,0 +1,30 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node.js
+node_modules/
+
+# Deployment
+.vercel/
+
+# IDE
+.vscode/
+
+# System
+.DS_Store
+Thumbs.db# Large generated PDF files
+/cards_normal_580.pdf
+/cards_normal_580.zip
+/cards_vip_80.pdf
+/graduation_cards_650.pdf
+/cards_child_50.pdf
+/cards_child_50 - Copy.pdf
